@@ -18,14 +18,19 @@ public class Salon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //Codigo del salon, A1 por ejemplo
+    @Column(nullable = false, unique = true)
     private String codigo;
-    private String grado;
 
-    @OneToMany(mappedBy = "salon", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Estudiante> estudiantes = new ArrayList<>();
+    @Column
+    private String grado;
 
     @OneToOne
     @JoinColumn(name="tutor_id")
     private Tutor tutor;
+
+    @OneToMany(mappedBy = "salon", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default //Mantiene el valor por defecto al usar builder
+    private List<Estudiante> estudiantes = new ArrayList<>();
 
 }
