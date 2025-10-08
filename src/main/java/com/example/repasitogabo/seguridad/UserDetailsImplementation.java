@@ -27,7 +27,6 @@ public class UserDetailsImplementation implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<Estudiante> estudiante = estudianteRepository.findByEmail(email);
         Optional<Tutor> tutor = tutorRepository.findByEmail(email);
-
         //Primero buscamos en estudiante
         if (estudiante.isPresent()) {
             Estudiante e = estudiante.get();
@@ -37,7 +36,6 @@ public class UserDetailsImplementation implements UserDetailsService {
                     Collections.singleton(new SimpleGrantedAuthority(e.getRol().name()))
             );
         }
-
         //Luego buscamos los tutores
         if (tutor.isPresent()) {
             Tutor t = tutor.get();
@@ -47,8 +45,5 @@ public class UserDetailsImplementation implements UserDetailsService {
                     Collections.singleton(new SimpleGrantedAuthority(t.getRol().name()))
             );
         }
-
-        throw new UsernameNotFoundException("Usuario con email: "+email+" no encontrado ");
-    }
-
+        throw new UsernameNotFoundException("Usuario con email: "+email+" no encontrado ");}
 }

@@ -21,9 +21,7 @@ public class SalonController {
 
     @PostMapping("/salon")
     public ResponseEntity<Salon> create(@Validated @RequestBody SalonCreateDTO salonDTO) {
-
         Salon savedsalon= salonService.crearSalon(salonDTO);
-                
         return new ResponseEntity<>(savedsalon, HttpStatus.CREATED);
     }
 }

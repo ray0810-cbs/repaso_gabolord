@@ -54,33 +54,26 @@ public class AuthService {
 
     @Transactional
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
-
         String password = null;
         String rol = null;
-
         Estudiante estudiante= estudianteRepository.findByEmail(loginRequestDTO.getEmail()).orElse(null);
         Tutor tutor = tutorRepository.findByEmail(loginRequestDTO.getEmail()).orElse(null);
-
         if (estudiante != null){
             password = estudiante.getPassword();
             rol= estudiante.getRol().name();
-        }
-        else if (tutor != null){
+        } else if (tutor != null){
             password = tutor.getPassword();
             rol= tutor.getRol().name();
-        }
-        else{
+        } else{
             //Luego cambiamos los errores para todos, primero le ponemos esto si no encuentra ni a profesor
             //Ni a alumnos
-            throw new RuntimeException();
+            throw new RuntimeException("Lol q mal");
         }
-
         //Chequea si la contraseña que ingresamos es valida para el usuario
         if (!passwordEncoder.matches(loginRequestDTO.getPassword(), password)){
             //Cambiar luego error
-            throw new RuntimeException();
+            throw new RuntimeException("Lol q mal");
         }
-
         // Generar token
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
         String token = jwtService.generateToken(userDetails, rol);

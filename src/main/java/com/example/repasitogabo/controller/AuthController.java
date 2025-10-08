@@ -1,7 +1,9 @@
 package com.example.repasitogabo.controller;
 
 import com.example.repasitogabo.dto.request.EstudianteRequestDTO;
+import com.example.repasitogabo.dto.request.LoginRequestDTO;
 import com.example.repasitogabo.dto.response.EstudianteResponseDTO;
+import com.example.repasitogabo.dto.response.LoginResponseDTO;
 import com.example.repasitogabo.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,12 @@ public class AuthController {
     public ResponseEntity<EstudianteResponseDTO> register(@Valid @RequestBody EstudianteRequestDTO requestDTO) {
         EstudianteResponseDTO responseDTO = authService.registrar(requestDTO);
         return  ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO>  login(@Valid @RequestBody LoginRequestDTO requestDTO) {
+        LoginResponseDTO responseDTO = authService.login(requestDTO);
+        return  ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
 }
