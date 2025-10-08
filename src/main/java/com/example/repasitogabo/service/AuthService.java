@@ -1,11 +1,15 @@
 package com.example.repasitogabo.service;
 
 import com.example.repasitogabo.clases.Estudiante;
+import com.example.repasitogabo.clases.Rol;
 import com.example.repasitogabo.clases.Tutor;
 import com.example.repasitogabo.dto.request.EstudianteRequestDTO;
 import com.example.repasitogabo.dto.request.LoginRequestDTO;
 import com.example.repasitogabo.dto.response.EstudianteResponseDTO;
 import com.example.repasitogabo.dto.response.LoginResponseDTO;
+import com.example.repasitogabo.exception.InvalidCredentialsException;
+import com.example.repasitogabo.exception.UserAlreadyExistsException;
+import com.example.repasitogabo.exception.UserNotFoundException;
 import com.example.repasitogabo.repositorios.EstudianteRepository;
 
 import com.example.repasitogabo.repositorios.SalonRepository;
@@ -35,20 +39,27 @@ public class AuthService {
     @Transactional
     public EstudianteResponseDTO registrar(EstudianteRequestDTO estudianteRequestDTO) {
 
+        if (estudianteRepository.existsByEmail(estudianteRequestDTO.getEmail()) ||
+                tutorRepository.existsByEmail(estudianteRequestDTO.getEmail())) {
+            throw new UserAlreadyExistsException("Ese email ya está registrado");
+        }
+
         //Inicializar valores de estudiante con valores en DTO
         Estudiante estudiante = Estudiante.builder()
                 .nombre(estudianteRequestDTO.getNombre())
                 .edad(estudianteRequestDTO.getEdad())
                 .email(estudianteRequestDTO.getEmail())
                 .password(passwordEncoder.encode(estudianteRequestDTO.getPassword()))
+                .rol(Rol.ROLE_ESTUDIANTE)
                 .build();
 
         //Guardar estudiante en BD
         Estudiante saved = estudianteRepository.save(estudiante);
 
         EstudianteResponseDTO respuesta =  modelMapper.map(saved, EstudianteResponseDTO.class);
-
         respuesta.setRol(saved.getRol().name().replace("ROLE_", ""));
+        if (saved.getSalon() != null) {
+            respuesta.setSalonId(saved.getSalon().getId());}
         return  respuesta;
     }
 
@@ -67,12 +78,12 @@ public class AuthService {
         } else{
             //Luego cambiamos los errores para todos, primero le ponemos esto si no encuentra ni a profesor
             //Ni a alumnos
-            throw new RuntimeException("Lol q mal");
+            throw new UserNotFoundException("No hay usuario registrado con ese email");
         }
         //Chequea si la contraseña que ingresamos es valida para el usuario
         if (!passwordEncoder.matches(loginRequestDTO.getPassword(), password)){
             //Cambiar luego error
-            throw new RuntimeException("Lol q mal");
+            throw new InvalidCredentialsException("Contraseña incorrecta");
         }
         // Generar token
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
