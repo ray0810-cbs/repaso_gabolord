@@ -1,25 +1,36 @@
 package com.example.repasitogabo.service;
 
 import com.example.repasitogabo.clases.Estudiante;
+import com.example.repasitogabo.clases.Tutor;
 import com.example.repasitogabo.dto.request.EstudianteRequestDTO;
+import com.example.repasitogabo.dto.request.LoginRequestDTO;
 import com.example.repasitogabo.dto.response.EstudianteResponseDTO;
+import com.example.repasitogabo.dto.response.LoginResponseDTO;
 import com.example.repasitogabo.repositorios.EstudianteRepository;
 
 import com.example.repasitogabo.repositorios.SalonRepository;
+import com.example.repasitogabo.repositorios.TutorRepository;
+import com.example.repasitogabo.seguridad.JwtService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
     private final EstudianteRepository estudianteRepository;
-    private final SalonRepository salonRepository;
+    private final TutorRepository tutorRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
+    private final UserDetailsService userDetailsService;
+    private final JwtService  jwtService;
 
     @Transactional
     public EstudianteResponseDTO registrar(EstudianteRequestDTO estudianteRequestDTO) {
@@ -29,7 +40,7 @@ public class AuthService {
                 .nombre(estudianteRequestDTO.getNombre())
                 .edad(estudianteRequestDTO.getEdad())
                 .email(estudianteRequestDTO.getEmail())
-                .password(estudianteRequestDTO.getPassword())
+                .password(passwordEncoder.encode(estudianteRequestDTO.getPassword()))
                 .build();
 
         //Guardar estudiante en BD
@@ -38,10 +49,42 @@ public class AuthService {
         EstudianteResponseDTO respuesta =  modelMapper.map(saved, EstudianteResponseDTO.class);
 
         respuesta.setRol(saved.getRol().name().replace("ROLE_", ""));
-        if (saved.getSalon() != null) {
-            respuesta.setSalonId(saved.getSalon().getId());
-        }
         return  respuesta;
+    }
+
+    @Transactional
+    public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
+
+        String password = null;
+        String rol = null;
+
+        Estudiante estudiante= estudianteRepository.findByEmail(loginRequestDTO.getEmail()).orElse(null);
+        Tutor tutor = tutorRepository.findByEmail(loginRequestDTO.getEmail()).orElse(null);
+
+        if (estudiante != null){
+            password = estudiante.getPassword();
+            rol= estudiante.getRol().name();
+        }
+        else if (tutor != null){
+            password = tutor.getPassword();
+            rol= tutor.getRol().name();
+        }
+        else{
+            //Luego cambiamos los errores para todos, primero le ponemos esto si no encuentra ni a profesor
+            //Ni a alumnos
+            throw new RuntimeException();
+        }
+
+        //Chequea si la contraseña que ingresamos es valida para el usuario
+        if (!passwordEncoder.matches(loginRequestDTO.getPassword(), password)){
+            //Cambiar luego error
+            throw new RuntimeException();
+        }
+
+        // Generar token
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
+        String token = jwtService.generateToken(userDetails, rol);
+        return new LoginResponseDTO(token, jwtService.getExpirationTime());
     }
 
 }

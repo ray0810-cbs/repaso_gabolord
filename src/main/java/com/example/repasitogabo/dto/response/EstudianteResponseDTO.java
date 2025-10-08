@@ -14,5 +14,4 @@ public class EstudianteResponseDTO {
     private int edad;
     private String email;
     private String rol;
-    private Long salonId;
 }

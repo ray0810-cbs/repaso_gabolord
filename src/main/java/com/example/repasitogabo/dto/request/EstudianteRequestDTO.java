@@ -12,7 +12,7 @@ public class EstudianteRequestDTO {
     @NotBlank(message = "Nombre obligatorio")
     private String nombre;
 
-    @NotBlank(message = "Edad obligatoria")
+    @NotNull(message = "Edad obligatoria")
     @Max(value = 60,message = "Eres muy viejo retirate")
     @Min(value = 17,message = "Tas bien chiquito, vuelve en unos años")
     private int edad;
