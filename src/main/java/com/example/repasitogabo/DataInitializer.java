@@ -58,19 +58,19 @@ public class DataInitializer {
 
                 // Crear salones (cada uno con su tutor)
                 Salon salon1 = Salon.builder()
-                        .codigo("A1")
+                        .codigo("A908")
                         .grado("Tercer ciclo")
                         .tutor(tutor1)
                         .build();
 
                 Salon salon2 = Salon.builder()
-                        .codigo("B1")
+                        .codigo("M103")
                         .grado("Cuarto ciclo")
                         .tutor(tutor2)
                         .build();
 
                 Salon salon3 = Salon.builder()
-                        .codigo("C1")
+                        .codigo("A1002")
                         .grado("Quinto ciclo")
                         .tutor(tutor3)  // CAMBIO AQUÍ: usar tutor3 en vez de tutor1
                         .build();

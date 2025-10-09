@@ -8,14 +8,12 @@ import com.example.repasitogabo.dto.response.MessageResponseDTO;
 import com.example.repasitogabo.dto.response.SalonResponseDTO;
 import com.example.repasitogabo.exception.SalonNotFoundException;
 import com.example.repasitogabo.exception.UnauthorizedAssignmentException;
-import com.example.repasitogabo.exception.UnauthorizedException;
 import com.example.repasitogabo.exception.UserNotFoundException;
 import com.example.repasitogabo.repositorios.EstudianteRepository;
 import com.example.repasitogabo.repositorios.SalonRepository;
 import com.example.repasitogabo.repositorios.TutorRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
